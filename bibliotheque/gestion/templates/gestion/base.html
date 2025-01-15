@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Bibliothèque{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-center">
+        <a class="navbar-brand" href="{% url 'dashboard' %}">Bibliothèque</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item {% if request.path == '/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item {% if request.path == '/membres/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'gestion_membres' %}">Gestion des membres</a>
+                </li>
+                <li class="nav-item {% if request.path == '/livres/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'gestion_livres' %}">Gestion des livres</a>
+                </li>
+                <li class="nav-item {% if request.path == '/abonnements/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'gestion_abonnements' %}">Gestion des abonnements</a>
+                </li>
+                <li class="nav-item {% if request.path == '/emprunts/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'gestion_emprunts' %}">Gestion des emprunts</a>
+                </li>
+                <li class="nav-item {% if request.path == '/exemplaires/' %}active{% endif %}">
+                    <a class="nav-link" href="{% url 'gestion_exemplaires' %}">Gestion des exemplaires</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-4">
+        {% block content %}
+        {% endblock %}
+    </div>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

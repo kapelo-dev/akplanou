@@ -1,0 +1,22 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Détails du livre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Détails du livre : {{ livre.titre }}</h1>
+    <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
+    <p><strong>ISBN:</strong> {{ livre.isbn }}</p>
+    <p><strong>Édition:</strong> {{ livre.edition }}</p>
+    <p><strong>Genre:</strong> {{ livre.genre }}</p>
+
+    <h2 class="mt-4">Exemplaires :</h2>
+    <ul class="list-group">
+        {% for exemplaire in exemplaires %}
+            <li class="list-group-item">Exemplaire {{ exemplaire.numero }} - {{ exemplaire.disponible|yesno:"Disponible,Indisponible" }}</li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn-primary mt-3" href="{% url 'ajouter_exemplaire' %}">Ajouter un exemplaire</a>
+    <a class="btn btn-secondary mt-3" href="javascript:history.back();">Retour</a>
+</div>
+{% endblock %}

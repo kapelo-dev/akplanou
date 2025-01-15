@@ -1,0 +1,15 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Supprimer un livre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Supprimer un livre</h1>
+    <p>Êtes-vous sûr de vouloir supprimer le livre "{{ livre.titre }}" ?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <a class="btn btn-secondary" href="{% url 'gestion_livres' %}">Annuler</a>
+    </form>
+</div>
+{% endblock %}

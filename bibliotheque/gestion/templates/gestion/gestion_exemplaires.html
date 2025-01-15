@@ -1,0 +1,30 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Gestion des exemplaires{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Gestion des exemplaires</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'ajouter_exemplaire' %}">Ajouter un exemplaire</a>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom du livre</th>
+                <th>Nombre d'exemplaires</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for livre in livres %}
+                <tr>
+                    <td>{{ livre.titre }}</td>
+                    <td>{{ livre.exemplaire_set.count }}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'livre_detail' livre.id %}">Voir les exemplaires</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

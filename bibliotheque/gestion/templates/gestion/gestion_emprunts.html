@@ -1,0 +1,20 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Gestion des emprunts{% endblock %}
+
+{% block content %}
+<h1>Gestion des emprunts</h1>
+<a class="btn btn-primary mb-3" href="{% url 'ajouter_emprunt' %}">Ajouter un emprunt</a>
+<ul>
+    {% for emprunt in emprunts %}
+        <li class="list-group-item">
+            <strong>{{ emprunt.membre }}</strong> a emprunté <strong>{{ emprunt.exemplaire.livre.titre }}</strong> le {{ emprunt.date_emprunt }} - Doit être rendu avant le {{ emprunt.date_retour_prevue }}
+            {% if emprunt.date_retour %}
+                <span class="badge badge-success">Rendu le {{ emprunt.date_retour }}</span>
+            {% else %}
+                <span class="badge badge-danger">Non rendu</span>
+            {% endif %}
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}

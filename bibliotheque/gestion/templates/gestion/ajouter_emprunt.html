@@ -1,0 +1,110 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Ajouter un emprunt{% endblock %}
+
+{% block content %}
+<h1>Ajouter un emprunt</h1>
+<form method="post" id="empruntForm">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="membre">Membre:</label>
+        <select id="membre" name="membre" class="form-control" required>
+            <option value="" disabled selected>Sélectionnez un membre</option>
+            {% for membre in membres %}
+                <option value="{{ membre.id }}">{{ membre.nom }} {{ membre.prenom }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div id="livres-container">
+        <div class="livre-selection">
+            <label for="livre-1">Livre:</label>
+            <select id="livre-1" class="form-control" onchange="loadExemplaires(this, 1)">
+                <option value="" disabled selected>Sélectionnez un livre</option>
+                {% for livre in livres %}
+                    <option value="{{ livre.id }}">{{ livre.titre }}</option>
+                {% endfor %}
+            </select>
+            <label for="exemplaire-1">Exemplaire:</label>
+            <select id="exemplaire-1" name="exemplaires" class="form-control" multiple>
+                <!-- Les exemplaires seront chargés ici -->
+            </select>
+            <button type="button" class="btn btn-primary mt-2" onclick="addSelected(this)">Ajouter ce livre</button>
+        </div>
+    </div>
+    <button type="button" class="btn btn-secondary mt-2" onclick="addLivreSelection()">Ajouter un livre</button>
+    <button type="button" class="btn btn-danger mt-2" onclick="removeSelected()">Supprimer un livre</button>
+    <button type="submit" class="btn btn-success mt-2">Ajouter</button>
+</form>
+
+<script>
+    let selectedExemplaires = [];
+    let counter = 1;
+
+    function loadExemplaires(selectElement, index) {
+        const livreId = selectElement.value;
+        fetch(`/load_exemplaires/${livreId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const exemplaireSelect = document.getElementById(`exemplaire-${index}`);
+                exemplaireSelect.innerHTML = '';
+                data.exemplaires.forEach(exemplaire => {
+                    const option = document.createElement('option');
+                    option.value = exemplaire.id;
+                    option.textContent = `${exemplaire.livre__titre} - Exemplaire ${exemplaire.numero}`;
+                    exemplaireSelect.appendChild(option);
+                });
+            });
+    }
+
+    function addSelected(buttonElement) {
+        const parentDiv = buttonElement.parentElement;
+        const exemplaireSelect = parentDiv.querySelector('[id^="exemplaire-"]');
+        const selectedOptions = Array.from(exemplaireSelect.selectedOptions);
+        selectedOptions.forEach(option => {
+            if (!selectedExemplaires.includes(option.value)) {
+                selectedExemplaires.push(option.value);
+            }
+        });
+        parentDiv.remove();
+    }
+
+    function addLivreSelection() {
+        counter++;
+        const container = document.getElementById('livres-container');
+        const newSelection = document.createElement('div');
+        newSelection.className = 'livre-selection';
+        newSelection.innerHTML = `
+            <label for="livre-${counter}">Livre:</label>
+            <select id="livre-${counter}" class="form-control" onchange="loadExemplaires(this, ${counter})">
+                <option value="" disabled selected>Sélectionnez un livre</option>
+                {% for livre in livres %}
+                    <option value="{{ livre.id }}">{{ livre.titre }}</option>
+                {% endfor %}
+            </select>
+            <label for="exemplaire-${counter}">Exemplaire:</label>
+            <select id="exemplaire-${counter}" name="exemplaires" class="form-control" multiple>
+                <!-- Les exemplaires seront chargés ici -->
+            </select>
+            <button type="button" class="btn btn-primary mt-2" onclick="addSelected(this)">Ajouter ce livre</button>
+        `;
+        container.appendChild(newSelection);
+    }
+
+    function removeSelected() {
+        const livresContainer = document.getElementById('livres-container');
+        const selections = livresContainer.querySelectorAll('.livre-selection');
+        if (selections.length > 0) {
+            const lastSelection = selections[selections.length - 1];
+            lastSelection.remove();
+        }
+    }
+
+    document.getElementById('empruntForm').onsubmit = function() {
+        const exemplairesInput = document.createElement('input');
+        exemplairesInput.type = 'hidden';
+        exemplairesInput.name = 'exemplaires';
+        exemplairesInput.value = selectedExemplaires.join(',');
+        this.appendChild(exemplairesInput);
+    };
+</script>
+{% endblock %}

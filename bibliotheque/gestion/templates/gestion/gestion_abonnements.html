@@ -1,0 +1,60 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Gestion des abonnements{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Gestion des abonnements</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'ajouter_abonnement' %}">Ajouter un abonnement</a>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Libellé</th>
+                <th>Coût</th>
+                <th>Nombre max de livres</th>
+                <th>Nombre max de jours</th>    
+                <th>Durée</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for abonnement in abonnements %}
+                <tr>
+                    <td>{{ abonnement.libelle }}</td>
+                    <td>{{ abonnement.cout }}FCFA</td>
+                    <td>{{ abonnement.max_livres }}</td>
+                    <td>{{ abonnement.max_jours }}</td>
+                    <td>{{ abonnement.duree }}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'modifier_abonnement' abonnement.id %}">Modifier</a>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal{{ abonnement.id }}">Supprimer</button>
+                        <!-- Modal de confirmation de suppression -->
+                        <div class="modal fade" id="confirmDeleteModal{{ abonnement.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{ abonnement.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmDeleteModalLabel{{ abonnement.id }}">Confirmer la suppression</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Êtes-vous sûr de vouloir supprimer cet abonnement ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                        <form method="post" action="{% url 'supprimer_abonnement' abonnement.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

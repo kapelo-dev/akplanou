@@ -1,0 +1,34 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Ajouter un livre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Ajouter un livre</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="titre">Titre:</label>
+            <input type="text" id="titre" name="titre" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="auteur">Auteur:</label>
+            <input type="text" id="auteur" name="auteur" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="isbn">ISBN:</label>
+            <input type="text" id="isbn" name="isbn" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="edition">Édition:</label>
+            <input type="text" id="edition" name="edition" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="genre">Genre:</label>
+            <input type="text" id="genre" name="genre" class="form-control" required>
+        </div>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+        <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
+    </form>
+</div>
+{% endblock %}

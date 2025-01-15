@@ -1,0 +1,33 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Ajouter un exemplaire{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Ajouter un exemplaire</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="livre">Livre:</label>
+            <select id="livre" name="livre" class="form-control" required>
+                <option value="" disabled selected>Sélectionnez un livre</option>
+                {% for livre in livres %}
+                    <option value="{{ livre.id }}">{{ livre.titre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="numero">Numéro:</label>
+            <input type="number" id="numero" name="numero" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label for="disponible">Disponible:</label>
+            <select id="disponible" name="disponible" class="form-control" required>
+                <option value="True">Oui</option>
+                <option value="False">Non</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-success">Ajouter</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+/* Style pour le menu de navigation */
+.navbar {
+    background-color: #000000; /* Fond noir */
+}
+
+.navbar-brand, .nav-link {
+    color: #f9f6f6 !important; /* Texte blanc */
+}
+
+.nav-link:hover {
+    color: #ffcc00 !important; /* Texte jaune au survol */
+}
+
+.navbar-toggler-icon {
+    color: #ffffff; /* Couleur de l'icône du bouton de navigation */
+}
+
+.navbar-nav .nav-item.active .nav-link {
+    background-color: #0056b3; /* Fond bleu foncé pour le lien actif */
+}
+

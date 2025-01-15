@@ -1,0 +1,15 @@
+body {
+    padding-top: 56px; /* Adjust for the navbar height */
+}
+
+.navbar-brand {
+    font-weight: bold;
+}
+
+.navbar-nav .nav-item.active .nav-link {
+    color: blue !important;
+}
+
+.container {
+    margin-top: 20px;
+}

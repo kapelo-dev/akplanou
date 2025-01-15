@@ -1,0 +1,15 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Supprimer un membre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Supprimer un membre</h1>
+    <p>Êtes-vous sûr de vouloir supprimer le membre "{{ membre.nom }} {{ membre.prenom }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <a class="btn btn-secondary" href="{% url 'gestion_membres' %}">Annuler</a>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Gestion des membres{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Gestion des membres</h1>
+    <a class="btn btn-primary mb-3" href="{% url 'ajouter_membre' %}">Ajouter un membre</a>
+    <table class="table table-bordered table-hover table-custom">
+        <thead class="thead-dark">
+            <tr>
+                <th>Nom</th>
+                <th>Prénom</th>
+                <th>Adresse</th>
+                <th>Téléphone</th>
+                <th>Abonnement</th>
+                <th>Statut</th>
+                <th>Date d'inscription</th>
+                <th>Date d'expiration</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for membre in membres %}
+                <tr>
+                    <td>{{ membre.nom }}</td>
+                    <td>{{ membre.prenom }}</td>
+                    <td>{{ membre.adresse }}</td>
+                    <td>{{ membre.telephone }}</td>
+                    <td>{{ membre.abonnement.libelle }}</td>
+                    <td>{{ membre.actif|yesno:"Actif,Inactif" }}</td>
+                    <td>{{ membre.date_inscription }}</td>
+                    <td>{{ membre.date_expiration }}</td>
+                    <td>
+                        <a class="btn btn-info btn-sm" href="{% url 'membre_detail' membre.id %}">Détails</a>
+                        <a class="btn btn-warning btn-sm" href="{% url 'modifier_membre' membre.id %}">Modifier</a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'supprimer_membre' membre.id %}">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

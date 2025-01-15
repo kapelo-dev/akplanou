@@ -1,0 +1,45 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Détails du membre{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="mb-4">Détails du membre : {{ membre.nom }} {{ membre.prenom }}</h1>
+    <p><strong>Nom:</strong> {{ membre.nom }}</p>
+    <p><strong>Prénom:</strong> {{ membre.prenom }}</p>
+    <p><strong>Adresse:</strong> {{ membre.adresse }}</p>
+    <p><strong>Téléphone:</strong> {{ membre.telephone }}</p>
+    <p><strong>Abonnement:</strong> {{ membre.abonnement.libelle }}</p>
+    <p><strong>Statut:</strong> {{ membre.actif|yesno:"Actif,Inactif" }}</p>
+    <p><strong>Date d'inscription:</strong> {{ membre.date_inscription }}</p>
+    <p><strong>Date d'expiration:</strong> {{ membre.date_expiration }}</p>
+
+    <h2 class="mt-4">Emprunts en cours</h2>
+    <table class="table table-bordered table-hover">
+        <thead class="thead-dark">
+            <tr>
+                <th>Livre</th>
+                <th>Exemplaire</th>
+                <th>Date d'emprunt</th>
+                <th>Date de retour prévue</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for emprunt in emprunts_en_cours %}
+                <tr>
+                    <td>{{ emprunt.exemplaire.livre.titre }}</td>
+                    <td>{{ emprunt.exemplaire.numero }}</td>
+                    <td>{{ emprunt.date_emprunt }}</td>
+                    <td>{{ emprunt.date_retour_prevue }}</td>
+                    <td>
+                        <a class="btn btn-danger btn-sm" href="{% url 'retour' emprunt.id %}">Marquer comme rendu</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    
+</div>
+{% endblock %}

@@ -103,6 +103,9 @@ def historique_view(request, membre_id):
 def dashboard_view(request):
     return render(request, 'gestion/dashboard.html')
 
+def accueil_view(request):
+    return render(request, 'gestion/accueil.html')
+
 def gestion_livres_view(request):
     livres = Livre.objects.all()
     return render(request, 'gestion/gestion_livres.html', {'livres': livres})

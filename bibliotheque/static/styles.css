@@ -19,3 +19,63 @@
     background-color: #0056b3; /* Fond bleu foncé pour le lien actif */
 }
 
+.list-group-item{
+    color: #000000;
+}
+
+.thead{
+    background-color: #f9f6f6;
+}
+
+/* Style pour le fond futuriste */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: linear-gradient(135deg, #ff00cc 0%, #333399 100%);
+    color: #ffffff;
+    overflow: hidden;
+}
+
+.jumbotron {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+.jumbotron h1 {
+    font-size: 3em;
+    margin-bottom: 20px;
+}
+
+.jumbotron p {
+    font-size: 1.2em;
+}
+
+/* Add some futuristic glow effect */
+.glow {
+    text-shadow: 0 0 5px #ff00cc, 0 0 10px #ff00cc, 0 0 15px #ff00cc, 0 0 20px #333399, 0 0 30px #333399, 0 0 40px #333399, 0 0 50px #333399;
+}
+
+.container {
+    padding: 20px;
+}
+
+.container h2 {
+    color: #ffcc00;
+}
+
+.container p, .container ul {
+    color: #ffffff;
+}
+
+footer {
+    text-align: center;
+    padding: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+

@@ -39,10 +39,12 @@ class Livre(models.Model):
     isbn = models.CharField(max_length=13)
     edition = models.CharField(max_length=100)
     genre = models.CharField(max_length=50)
+    couverture = models.ImageField(upload_to='couvertures/', null=True, blank=True)
 
     def __str__(self):
         return self.titre
-
+    def exemplaires_disponibles(self):
+        return self.exemplaire_set.filter(disponible=True).count()
 
 class Exemplaire(models.Model):
     livre = models.ForeignKey(Livre, on_delete=models.CASCADE)

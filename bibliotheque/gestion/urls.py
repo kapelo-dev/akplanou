@@ -1,6 +1,7 @@
-from django.urls import path
+from django.urls import path,include
 from . import views
-
+from django.conf import settings
+from django.conf.urls.static import static
 urlpatterns = [
     path('', views.dashboard_view, name='dashboard'),
     path('membres/', views.gestion_membres_view, name='gestion_membres'),
@@ -25,3 +26,5 @@ urlpatterns = [
     path('supprimer_membre/<int:membre_id>/', views.supprimer_membre_view, name='supprimer_membre'),
     path('supprimer_abonnement/<int:abonnement_id>/', views.supprimer_abonnement_view, name='supprimer_abonnement'),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

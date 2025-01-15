@@ -191,3 +191,6 @@ def ajouter_exemplaire_view(request):
     else:
         livres = Livre.objects.all()
         return render(request, 'gestion/ajouter_exemplaire.html', {'livres': livres})
+def exemplaires_empruntes(self):
+        # Supposons que vous avez un modèle Exemplaire avec un champ emprunte
+        return self.exemplaire_set.filter(emprunte=True).count()

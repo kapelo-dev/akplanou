@@ -12,8 +12,7 @@ class MembreForm(forms.ModelForm):
 class LivreForm(forms.ModelForm):
     class Meta:
         model = Livre
-        fields = ['titre', 'auteur', 'isbn', 'edition', 'genre']
-
+        fields = ['titre', 'auteur', 'isbn', 'edition', 'genre', 'couverture']
 
 class AbonnementForm(forms.ModelForm):
     class Meta:

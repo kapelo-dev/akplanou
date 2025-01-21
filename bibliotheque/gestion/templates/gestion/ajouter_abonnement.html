@@ -4,31 +4,36 @@
 
 {% block content %}
 <div class="container mt-4">
+    <a href="javascript:history.back()" class="btn btn-link mb-3">
+        <i class="fas fa-arrow-left fa-2x border border-white p-2 rounded"></i>
+    </a>
     <h1 class="mb-4">Ajouter un abonnement</h1>
     <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="libelle">Libellé:</label>
+        <div class="form-group mb-2">
+            <label for="libelle" class="mb-1">Libellé:</label>
             <input type="text" id="libelle" name="libelle" class="form-control" required>
         </div>
-        <div class="form-group">
-            <label for="cout">Coût:</label>
+        <div class="form-group mb-2">
+            <label for="cout" class="mb-1">Coût:</label>
             <input type="number" id="cout" name="cout" class="form-control" step="0.01" required>
         </div>
-        <div class="form-group">
-            <label for="max_livres">Nombre maximum de livres:</label>
+        <div class="form-group mb-2">
+            <label for="max_livres" class="mb-1">Nombre maximum de livres:</label>
             <input type="number" id="max_livres" name="max_livres" class="form-control" required>
         </div>
-        <div class="form-group">
-            <label for="max_jours">Nombre maximum de jours:</label>
+        <div class="form-group mb-2">
+            <label for="max_jours" class="mb-1">Nombre maximum de jours:</label>
             <input type="number" id="max_jours" name="max_jours" class="form-control" required>
         </div>
-        <div class="form-group">
-            <label for="duree">Durée de l'abonnement (jours):</label>
+        <div class="form-group mb-2">
+            <label for="duree" class="mb-1">Durée de l'abonnement (jours):</label>
             <input type="number" id="duree" name="duree" class="form-control" required>
         </div>
-        <button type="submit" class="btn btn-success">Ajouter</button>
-        <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
+        <div class="d-flex justify-content-between">
+            <button type="submit" class="btn btn-success">Ajouter</button>
+            <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
+        </div>
     </form>
 </div>
 {% endblock %}

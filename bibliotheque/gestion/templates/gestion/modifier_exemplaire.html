@@ -1,0 +1,18 @@
+{% extends "gestion/base.html" %}
+
+{% block title %}Modifier un exemplaire{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <a href="javascript:history.back()" class="btn btn-link mb-3">
+        <i class="fas fa-arrow-left fa-2x border border-white p-2 rounded"></i>
+    </a>
+    <h1 class="mb-4">Modifier l'exemplaire {{ exemplaire.numero }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">Enregistrer</button>
+        <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
+    </form>
+</div>
+{% endblock %}

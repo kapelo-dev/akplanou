@@ -1,21 +1,37 @@
 {% extends "gestion/base.html" %}
+{% load static %}
 
 {% block title %}Gestion des exemplaires{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Gestion des exemplaires</h1>
-    <a class="btn btn-primary mb-3" href="{% url 'ajouter_exemplaire' %}">Ajouter un exemplaire</a>
-    <table class="table table-bordered table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Nom du livre</th>
-                <th>Nombre d'exemplaires</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for livre in livres %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-book me-3"></i>Gestion des exemplaires
+            </h1>
+            <div class="search-bar">
+                <input type="text" id="search" name="search" placeholder="Rechercher un exemplaire..." onkeyup="filterTable()">
+                <a href="{% url 'ajouter_exemplaire' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un exemplaire
+                </a>
+                
+            </div>
+            <hr class="mb-4">
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="exemplairesTable" class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Nom du livre</th>
+                    <th>Nombre d'exemplaires</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livre in livres %}
                 <tr>
                     <td>{{ livre.titre }}</td>
                     <td>{{ livre.exemplaire_set.count }}</td>
@@ -23,8 +39,64 @@
                         <a class="btn btn-info btn-sm" href="{% url 'livre_detail' livre.id %}">Voir les exemplaires</a>
                     </td>
                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if livres.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Première</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.previous_page_number }}">Précédent</a>
+            </li>
+            {% endif %}
+
+            {% for num in livres.paginator.page_range %}
+            {% if livres.number == num %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% elif num > livres.number|add:'-3' and num < livres.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+
+            {% if livres.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.next_page_number }}">Suivant</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.paginator.num_pages }}">Dernière &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
+
+<script>
+function filterTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("exemplairesTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0]; // Assuming the titre is in the first column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
 {% endblock %}

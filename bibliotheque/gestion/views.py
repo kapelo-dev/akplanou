@@ -58,7 +58,7 @@ def ajouter_abonnement_view(request):
     return render(request, 'gestion/ajouter_abonnement.html', {'form': form})
 
 def gestion_emprunts_view(request):
-    emprunts = Emprunt.objects.all()
+    emprunts = Emprunt.objects.all().order_by('-date_emprunt')
     return render(request, 'gestion/gestion_emprunts.html', {'emprunts': emprunts})
 
 def ajouter_emprunt_view(request):
@@ -103,6 +103,9 @@ def historique_view(request, membre_id):
 def dashboard_view(request):
     return render(request, 'gestion/dashboard.html')
 
+def accueil_view(request):
+    return render(request, 'gestion/accueil.html')
+
 def gestion_livres_view(request):
     livres = Livre.objects.all()
     return render(request, 'gestion/gestion_livres.html', {'livres': livres})
@@ -117,7 +120,7 @@ def gestion_exemplaires_view(request):
 
 def ajouter_livre_view(request):
     if request.method == 'POST':
-        form = LivreForm(request.POST)
+        form = LivreForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('gestion_livres')
@@ -131,22 +134,13 @@ def livre_detail_view(request, livre_id):
 def modifier_livre_view(request, livre_id):
     livre = get_object_or_404(Livre, id=livre_id)
     if request.method == 'POST':
-        titre = request.POST.get('titre')
-        auteur = request.POST.get('auteur')
-        isbn = request.POST.get('isbn')
-        edition = request.POST.get('edition')
-        genre = request.POST.get('genre')
-
-        livre.titre = titre
-        livre.auteur = auteur
-        livre.isbn = isbn
-        livre.edition = edition
-        livre.genre = genre
-        livre.save()
-        return redirect('gestion_livres')
+        form = LivreForm(request.POST, request.FILES, instance=livre)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_livres')
     else:
-        return render(request, 'gestion/modifier_livre.html', {'livre': livre})
-
+        form = LivreForm(instance=livre)
+    return render(request, 'gestion/modifier_livre.html', {'form': form, 'livre': livre})
 def supprimer_livre_view(request, livre_id):
     livre = get_object_or_404(Livre, id=livre_id)
     if request.method == 'POST':
@@ -193,4 +187,22 @@ def ajouter_exemplaire_view(request):
         return render(request, 'gestion/ajouter_exemplaire.html', {'livres': livres})
 def exemplaires_empruntes(self):
         # Supposons que vous avez un modèle Exemplaire avec un champ emprunte
-        return self.exemplaire_set.filter(emprunte=True).count()
+        return self.exemplaire_set.filter(disponible=False).count()
+    
+def modifier_exemplaire(request, exemplaire_id):
+    exemplaire = get_object_or_404(Exemplaire, id=exemplaire_id)
+    if request.method == 'POST':
+        form = ExemplaireForm(request.POST, instance=exemplaire)
+        if form.is_valid():
+            form.save()
+            return redirect('livre_detail', livre_id=exemplaire.livre.id)
+    else:
+        form = ExemplaireForm(instance=exemplaire)
+    return render(request, 'gestion/modifier_exemplaire.html', {'form': form, 'exemplaire': exemplaire})
+
+def supprimer_exemplaire(request, exemplaire_id):
+    exemplaire = get_object_or_404(Exemplaire, id=exemplaire_id)
+    if request.method == 'POST':
+        exemplaire.delete()
+        return redirect('livre_detail', livre_id=exemplaire.livre.id)
+    return render(request, 'gestion/supprimer_exemplaire.html', {'exemplaire': exemplaire})

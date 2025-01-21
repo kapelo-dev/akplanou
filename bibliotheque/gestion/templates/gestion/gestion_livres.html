@@ -10,47 +10,134 @@
             <h1 class="display-4 text-primary mb-3">
                 <i class="fas fa-book me-3"></i>Liste des Livres
             </h1>
-            <a href="{% url 'ajouter_livre' %}" class="btn btn-success">
-                <i class="fas fa-plus-circle me-2"></i>Ajouter un Livre
-            </a>
+            <div class="search-bar">
+                <input type="text" id="search" name="search" placeholder="Rechercher un livre..." onkeyup="filterTable()">
+                <a href="{% url 'ajouter_livre' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un Livre
+                </a>
+            </div>
             <hr class="mb-4">
         </div>
     </div>
 
-    <div class="row">
-        {% for livre in livres %}
-        <div class="col-md-6 col-lg-4 mb-4">
-            <div class="card shadow-sm">
-                {% if livre.couverture %}
-                <img src="{{ livre.couverture.url }}" class="card-img-top" alt="{{ livre.titre }}">
-                {% else %}
-                <img src="{% static 'images/default_cover.jpg' %}" class="card-img-top" alt="Couverture par défaut">
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title text-primary">{{ livre.titre }}</h5>
-                    <h6 class="card-subtitle mb-2 text-muted">De {{ livre.auteur }}</h6>
-                    <p class="card-text text-muted">
-                        <strong>Genre :</strong> {{ livre.genre }}<br>
-                        <strong>Année :</strong> {{ livre.annee }}<br>
-                        <strong>Nombre d'exemplaires :</strong> {{ livre.nombre_exemplaire }}<br>
-                        <strong>Exemplaires empruntés :</strong> {{ livre.exemplaires_empruntes }}
-                    </p>
-                    <div class="d-flex justify-content-between">
+    <div class="table-container">
+        <table id="livresTable" class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Couverture</th>
+                    <th>Titre</th>
+                    <th>Auteur</th>
+                    <th>Genre</th>
+                    <th>Edition</th>
+                    <th>Exemplaires</th>
+                    <th>Disponibles</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livre in livres %}
+                <tr>
+                    <td>
+                        {% if livre.couverture %}
+                        <img src="{{ livre.couverture.url }}" alt="{{ livre.titre }}" style="width: 50px; height: 75px;">
+                        {% else %}
+                        <img src="{% static 'images/logo.png' %}" alt="Couverture par défaut" style="width: 50px; height: 75px;">
+                        {% endif %}
+                    </td>
+                    <td>{{ livre.titre }}</td>
+                    <td>{{ livre.auteur }}</td>
+                    <td>{{ livre.genre }}</td>
+                    <td>{{ livre.edition }}</td>
+                    <td>{{ livre.exemplaire_set.count }}</td>
+                    <td>{{ livre.exemplaires_disponibles }}</td>
+                    <td>
                         <a href="{% url 'modifier_livre' livre.id %}" class="btn btn-warning btn-sm">
                             <i class="fas fa-edit me-2"></i>Modifier
                         </a>
-                        <a href="{% url 'supprimer_livre' livre.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce livre ?');">
-                            <i class="fas fa-trash me-2"></i>Supprimer
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal{{ livre.id }}">Supprimer</button>
+                        <!-- Modal de confirmation de suppression -->
+                        <div class="modal fade" id="confirmDeleteModal{{ livre.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{ livre.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmDeleteModalLabel{{ livre.id }}">Confirmer la suppression</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Êtes-vous sûr de vouloir supprimer ce livre ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                        <form method="post" action="{% url 'supprimer_livre' livre.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
     <div class="d-flex justify-content-center mt-4">
-        {{ pagination }}
+        <ul class="pagination">
+            {% if livres.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Première</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.previous_page_number }}">Précédent</a>
+            </li>
+            {% endif %}
+
+            {% for num in livres.paginator.page_range %}
+            {% if livres.number == num %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% elif num > livres.number|add:'-3' and num < livres.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if livres.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.next_page_number }}">Suivant</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ livres.paginator.num_pages }}">Dernière &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
     </div>
 </div>
+
+<script>
+function filterTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("livresTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[1]; // Assuming the title is in the second column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
 {% endblock %}

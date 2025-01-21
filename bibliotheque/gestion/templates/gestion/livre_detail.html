@@ -1,22 +1,93 @@
 {% extends "gestion/base.html" %}
+{% load static %}
 
 {% block title %}Détails du livre{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Détails du livre : {{ livre.titre }}</h1>
-    <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
-    <p><strong>ISBN:</strong> {{ livre.isbn }}</p>
-    <p><strong>Édition:</strong> {{ livre.edition }}</p>
-    <p><strong>Genre:</strong> {{ livre.genre }}</p>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-book me-3"></i>Détails du livre : {{ livre.titre }}
+            </h1>
+            <div class="search-bar">
+                <input type="text" id="search" name="search" placeholder="Rechercher un exemplaire..." onkeyup="filterList()">
+                <a href="{% url 'ajouter_exemplaire' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un exemplaire
+                </a>
+                <a href="javascript:history.back()" class="btn btn-link">
+                    <i class="fas fa-arrow-left fa-2x border border-white p-2 rounded"></i> Retour
+                </a>
+            </div>
+            <hr class="mb-4">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <p><strong>Auteur:</strong> {{ livre.auteur }}</p>
+            <p><strong>ISBN:</strong> {{ livre.isbn }}</p>
+            <p><strong>Édition:</strong> {{ livre.edition }}</p>
+            <p><strong>Genre:</strong> {{ livre.genre }}</p>
+        </div>
+    </div>
 
     <h2 class="mt-4">Exemplaires :</h2>
-    <ul class="list-group">
+    <ul class="list-group" id="exemplairesList">
         {% for exemplaire in exemplaires %}
-            <li class="list-group-item">Exemplaire {{ exemplaire.numero }} - {{ exemplaire.disponible|yesno:"Disponible,Indisponible" }}</li>
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                Exemplaire {{ exemplaire.numero }} - {{ exemplaire.disponible|yesno:"Disponible,Indisponible" }}
+                <div>
+                    <a href="{% url 'modifier_exemplaire' exemplaire.id %}" class="btn btn-info btn-sm">
+                        <i class="fas fa-edit"></i> Modifier
+                    </a>
+                    <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal{{ exemplaire.id }}">
+                        <i class="fas fa-trash"></i> Supprimer
+                    </button>
+                    <!-- Modal de confirmation de suppression -->
+                    <div class="modal fade" id="confirmDeleteModal{{ exemplaire.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{ exemplaire.id }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="confirmDeleteModalLabel{{ exemplaire.id }}">Confirmer la suppression</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    Êtes-vous sûr de vouloir supprimer cet exemplaire ?
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                    <form method="post" action="{% url 'supprimer_exemplaire' exemplaire.id %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger">Supprimer</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
         {% endfor %}
     </ul>
-    <a class="btn btn-primary mt-3" href="{% url 'ajouter_exemplaire' %}">Ajouter un exemplaire</a>
-    <a class="btn btn-secondary mt-3" href="javascript:history.back();">Retour</a>
 </div>
+
+<script>
+function filterList() {
+    var input, filter, ul, li, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("exemplairesList");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        txtValue = li[i].textContent || li[i].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+}
+</script>
 {% endblock %}

@@ -1,9 +1,9 @@
 from django.urls import path,include
 from . import views
-from django.conf import settings
-from django.conf.urls.static import static
+
 urlpatterns = [
     path('', views.dashboard_view, name='dashboard'),
+    path('accueil/', views.accueil_view, name='accueil'),
     path('membres/', views.gestion_membres_view, name='gestion_membres'),
     path('livres/', views.gestion_livres_view, name='gestion_livres'),
     path('abonnements/', views.gestion_abonnements_view, name='gestion_abonnements'),
@@ -25,6 +25,6 @@ urlpatterns = [
     path('modifier_membre/<int:membre_id>/', views.modifier_membre_view, name='modifier_membre'),
     path('supprimer_membre/<int:membre_id>/', views.supprimer_membre_view, name='supprimer_membre'),
     path('supprimer_abonnement/<int:abonnement_id>/', views.supprimer_abonnement_view, name='supprimer_abonnement'),
+    path('modifier_exemplaire/<int:exemplaire_id>/', views.modifier_exemplaire, name='modifier_exemplaire'),
+    path('supprimer_exemplaire/<int:exemplaire_id>/', views.supprimer_exemplaire, name='supprimer_exemplaire'),
 ]
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

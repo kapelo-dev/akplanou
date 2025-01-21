@@ -1,27 +1,42 @@
 {% extends "gestion/base.html" %}
+{% load static %}
 
 {% block title %}Gestion des abonnements{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h1 class="mb-4">Gestion des abonnements</h1>
-    <a class="btn btn-primary mb-3" href="{% url 'ajouter_abonnement' %}">Ajouter un abonnement</a>
-    <table class="table table-bordered table-hover">
-        <thead class="thead-dark">
-            <tr>
-                <th>Libellé</th>
-                <th>Coût</th>
-                <th>Nombre max de livres</th>
-                <th>Nombre max de jours</th>    
-                <th>Durée</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for abonnement in abonnements %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-tags me-3"></i>Gestion des abonnements
+            </h1>
+            <div class="search-bar">
+                <input type="text" id="search" name="search" placeholder="Rechercher un abonnement..." onkeyup="filterTable()">
+                <a href="{% url 'ajouter_abonnement' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un abonnement
+                </a>
+            </div>
+            <hr class="mb-4">
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="abonnementsTable" class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Libellé</th>
+                    <th>Coût</th>
+                    <th>Nombre max de livres</th>
+                    <th>Nombre max de jours</th>
+                    <th>Durée</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for abonnement in abonnements %}
                 <tr>
                     <td>{{ abonnement.libelle }}</td>
-                    <td>{{ abonnement.cout }}FCFA</td>
+                    <td>{{ abonnement.cout }} FCFA</td>
                     <td>{{ abonnement.max_livres }}</td>
                     <td>{{ abonnement.max_jours }}</td>
                     <td>{{ abonnement.duree }}</td>
@@ -53,8 +68,64 @@
                         </div>
                     </td>
                 </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if abonnements.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Première</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ abonnements.previous_page_number }}">Précédent</a>
+            </li>
+            {% endif %}
+
+            {% for num in abonnements.paginator.page_range %}
+            {% if abonnements.number == num %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% elif num > abonnements.number|add:'-3' and num < abonnements.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
             {% endfor %}
-        </tbody>
-    </table>
+
+            {% if abonnements.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ abonnements.next_page_number }}">Suivant</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ abonnements.paginator.num_pages }}">Dernière &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
 </div>
+
+<script>
+function filterTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("abonnementsTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0]; // Assuming the libelle is in the first column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
 {% endblock %}

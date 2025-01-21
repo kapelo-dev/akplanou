@@ -1,20 +1,110 @@
 {% extends "gestion/base.html" %}
+{% load static %}
 
 {% block title %}Gestion des emprunts{% endblock %}
 
 {% block content %}
-<h1>Gestion des emprunts</h1>
-<a class="btn btn-primary mb-3" href="{% url 'ajouter_emprunt' %}">Ajouter un emprunt</a>
-<ul>
-    {% for emprunt in emprunts %}
-        <li class="list-group-item">
-            <strong>{{ emprunt.membre }}</strong> a emprunté <strong>{{ emprunt.exemplaire.livre.titre }}</strong> le {{ emprunt.date_emprunt }} - Doit être rendu avant le {{ emprunt.date_retour_prevue }}
-            {% if emprunt.date_retour %}
-                <span class="badge badge-success">Rendu le {{ emprunt.date_retour }}</span>
-            {% else %}
-                <span class="badge badge-danger">Non rendu</span>
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-book-reader me-3"></i>Gestion des emprunts
+            </h1>
+            <div class="search-bar">
+                <input type="text" id="search" name="search" placeholder="Rechercher un emprunt..." onkeyup="filterTable()">
+                <a href="{% url 'ajouter_emprunt' %}" class="btn btn-success">
+                    <i class="fas fa-plus-circle me-2"></i>Ajouter un emprunt
+                </a>
+                
+            </div>
+            <hr class="mb-4">
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table id="empruntsTable" class="table table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th>Membre</th>
+                    <th>Livre</th>
+                    <th>Date d'emprunt</th>
+                    <th>Date de retour prévue</th>
+                    <th>Statut</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for emprunt in emprunts %}
+                <tr>
+                    <td>{{ emprunt.membre }}</td>
+                    <td>{{ emprunt.exemplaire.livre.titre }}</td>
+                    <td>{{ emprunt.date_emprunt }}</td>
+                    <td>{{ emprunt.date_retour_prevue }}</td>
+                    <td>
+                        {% if emprunt.date_retour %}
+                            <span class="badge badge-success">Rendu le {{ emprunt.date_retour }}</span>
+                        {% else %}
+                            <span class="badge badge-danger">Non rendu</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="d-flex justify-content-center mt-4">
+        <ul class="pagination">
+            {% if emprunts.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page=1">&laquo; Première</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ emprunts.previous_page_number }}">Précédent</a>
+            </li>
             {% endif %}
-        </li>
-    {% endfor %}
-</ul>
+
+            {% for num in emprunts.paginator.page_range %}
+            {% if emprunts.number == num %}
+            <li class="page-item active">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% elif num > emprunts.number|add:'-3' and num < emprunts.number|add:'3' %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+            </li>
+            {% endif %}
+            {% endfor %}
+
+            {% if emprunts.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ emprunts.next_page_number }}">Suivant</a>
+            </li>
+            <li class="page-item">
+                <a class="page-link" href="?page={{ emprunts.paginator.num_pages }}">Dernière &raquo;</a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+
+<script>
+function filterTable() {
+    var input, filter, table, tr, td, i, txtValue;
+    input = document.getElementById("search");
+    filter = input.value.toUpperCase();
+    table = document.getElementById("empruntsTable");
+    tr = table.getElementsByTagName("tr");
+    for (i = 0; i < tr.length; i++) {
+        td = tr[i].getElementsByTagName("td")[0]; // Assuming the membre is in the first column
+        if (td) {
+            txtValue = td.textContent || td.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+            } else {
+                tr[i].style.display = "none";
+            }
+        }
+    }
+}
+</script>
 {% endblock %}

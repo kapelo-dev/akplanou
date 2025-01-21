@@ -3,6 +3,7 @@
 {% block title %}Détails du membre{% endblock %}
 
 {% block content %}
+{% load static %}
 <div class="container mt-4">
     <h1 class="mb-4">Détails du membre : {{ membre.nom }} {{ membre.prenom }}</h1>
     <p><strong>Nom:</strong> {{ membre.nom }}</p>
@@ -18,6 +19,7 @@
     <table class="table table-bordered table-hover">
         <thead class="thead-dark">
             <tr>
+                <th>Couverture</th>
                 <th>Livre</th>
                 <th>Exemplaire</th>
                 <th>Date d'emprunt</th>
@@ -28,6 +30,13 @@
         <tbody>
             {% for emprunt in emprunts_en_cours %}
                 <tr>
+                    <td>
+                        {% if livre.couverture %}
+                        <img src="{{ livre.couverture.url }}" alt="{{ livre.titre }}" style="width: 50px; height: 75px;">
+                        {% else %}
+                        <img src="{% static 'images/logo.png' %}" alt="Couverture par défaut" style="width: 50px; height: 75px;">
+                        {% endif %}
+                    </td>
                     <td>{{ emprunt.exemplaire.livre.titre }}</td>
                     <td>{{ emprunt.exemplaire.numero }}</td>
                     <td>{{ emprunt.date_emprunt }}</td>

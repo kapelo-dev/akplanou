@@ -8,6 +8,17 @@
         <i class="fas fa-arrow-left fa-2x border border-white p-2 rounded"></i>
     </a>
     <h1 class="mb-4">Ajouter un abonnement</h1>
+
+    <!-- Message de succès -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
     <form method="post">
         {% csrf_token %}
         <div class="form-group mb-2">
@@ -36,4 +47,13 @@
         </div>
     </form>
 </div>
+
+<!-- Script pour confirmer l'ajout -->
+<script>
+    document.querySelector('form').addEventListener('submit', function(event) {
+        if (!confirm('Êtes-vous sûr de vouloir ajouter cet abonnement ?')) {
+            event.preventDefault(); // Annule la soumission du formulaire
+        }
+    });
+</script>
 {% endblock %}

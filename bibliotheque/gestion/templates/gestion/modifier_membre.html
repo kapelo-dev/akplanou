@@ -5,10 +5,25 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Modifier un membre</h1>
+
+    <!-- Message de confirmation -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Formulaire de modification -->
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-success">Enregistrer</button>
+        <a href="{% url 'liste_membres' %}" class="btn btn-secondary">Annuler</a>
     </form>
 </div>
 {% endblock %}

@@ -5,7 +5,18 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Modifier un abonnement</h1>
-    <form method="post">
+
+    <!-- Messages de succès ou d'erreur -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="abonnementForm">
         {% csrf_token %}
         <div class="form-group">
             <label for="libelle">Libellé:</label>
@@ -31,4 +42,13 @@
         <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
     </form>
 </div>
+
+<!-- Script pour confirmer l'enregistrement -->
+<script>
+document.getElementById('abonnementForm').onsubmit = function(event) {
+    if (!confirm("Êtes-vous sûr de vouloir enregistrer les modifications ?")) {
+        event.preventDefault(); // Annule la soumission du formulaire
+    }
+};
+</script>
 {% endblock %}

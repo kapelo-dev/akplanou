@@ -6,7 +6,18 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Modifier un livre</h1>
-    <form method="post" enctype="multipart/form-data">
+
+    <!-- Messages de succès ou d'erreur -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" enctype="multipart/form-data" id="livreForm">
         {% csrf_token %}
         <div class="form-group">
             <label for="titre">Titre:</label>
@@ -30,10 +41,29 @@
         </div>
         <div class="form-group">
             <label for="couverture">Couverture:</label>
-            <input type="file" id="couverture" name="couverture" class="form-control-file">
+            <input type="file" id="couverture" name="couverture" class="form-control-file" accept="image/*">
         </div>
         <button type="submit" class="btn btn-success">Enregistrer</button>
         <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
     </form>
 </div>
+
+<!-- Script pour confirmer l'enregistrement et valider le fichier -->
+<script>
+document.getElementById('livreForm').onsubmit = function(event) {
+    const couvertureInput = document.getElementById('couverture');
+    if (couvertureInput.files.length > 0) {
+        const file = couvertureInput.files[0];
+        if (!file.type.startsWith('image/')) {
+            alert("Veuillez sélectionner un fichier image valide pour la couverture.");
+            event.preventDefault();
+            return;
+        }
+    }
+
+    if (!confirm("Êtes-vous sûr de vouloir enregistrer les modifications ?")) {
+        event.preventDefault(); // Annule la soumission du formulaire
+    }
+};
+</script>
 {% endblock %}

@@ -5,10 +5,28 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Supprimer un livre</h1>
-    <p>Êtes-vous sûr de vouloir supprimer le livre "{{ livre.titre }}" ?</p>
+
+    <!-- Message de confirmation ou d'erreur -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Message de confirmation de suppression -->
+    <div class="alert alert-warning" role="alert">
+        Êtes-vous sûr de vouloir supprimer le livre <strong>"{{ livre.titre }}"</strong> ? Cette action est irréversible.
+    </div>
+
+    <!-- Formulaire de suppression -->
     <form method="post">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Supprimer</button>
+        <button type="submit" class="btn btn-danger">Confirmer la suppression</button>
         <a class="btn btn-secondary" href="{% url 'gestion_livres' %}">Annuler</a>
     </form>
 </div>

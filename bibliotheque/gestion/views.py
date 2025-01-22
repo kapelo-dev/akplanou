@@ -1,9 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Emprunt, Exemplaire, Membre, Livre, Abonnement
 from .forms import EmpruntForm, MembreForm, LivreForm, AbonnementForm, ExemplaireForm
+from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.http import JsonResponse
-
+from django.contrib.auth.decorators import login_required
+@login_required
 def gestion_membres_view(request):
     membres = Membre.objects.all()
     return render(request, 'gestion/gestion_membres.html', {'membres': membres})
@@ -56,11 +58,11 @@ def ajouter_abonnement_view(request):
     else:
         form = AbonnementForm()
     return render(request, 'gestion/ajouter_abonnement.html', {'form': form})
-
+@login_required
 def gestion_emprunts_view(request):
     emprunts = Emprunt.objects.all().order_by('-date_emprunt')
     return render(request, 'gestion/gestion_emprunts.html', {'emprunts': emprunts})
-
+@login_required
 def ajouter_emprunt_view(request):
     if request.method == 'POST':
         membre_id = request.POST.get('membre')
@@ -100,24 +102,22 @@ def historique_view(request, membre_id):
     emprunts = Emprunt.objects.filter(membre_id=membre_id)
     return render(request, 'gestion/historique.html', {'emprunts': emprunts})
 
-def dashboard_view(request):
-    return render(request, 'gestion/dashboard.html')
 
 def accueil_view(request):
     return render(request, 'gestion/accueil.html')
-
+@login_required
 def gestion_livres_view(request):
     livres = Livre.objects.all()
     return render(request, 'gestion/gestion_livres.html', {'livres': livres})
-
+@login_required
 def gestion_abonnements_view(request):
     abonnements = Abonnement.objects.all()
     return render(request, 'gestion/gestion_abonnements.html', {'abonnements': abonnements})
-
+@login_required
 def gestion_exemplaires_view(request):
     livres = Livre.objects.all()
     return render(request, 'gestion/gestion_exemplaires.html', {'livres': livres})
-
+@login_required
 def ajouter_livre_view(request):
     if request.method == 'POST':
         form = LivreForm(request.POST, request.FILES)
@@ -206,3 +206,101 @@ def supprimer_exemplaire(request, exemplaire_id):
         exemplaire.delete()
         return redirect('livre_detail', livre_id=exemplaire.livre.id)
     return render(request, 'gestion/supprimer_exemplaire.html', {'exemplaire': exemplaire})
+
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from .forms import SignUpForm
+
+def signup(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')  # Redirige vers la page d'accueil après l'inscription
+    else:
+        form = SignUpForm()
+    return render(request, 'registration/signup.html', {'form': form})
+
+from django.contrib.auth.decorators import login_required
+
+
+from django.shortcuts import render
+from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncDay  # Grouper par jour
+from .models import Livre, Membre, Emprunt
+from datetime import timedelta
+@login_required
+def dashboard_view(request):
+    # Statistiques principales
+    total_livres = Livre.objects.count()
+    membres_actifs = Membre.objects.filter(actif=True).count()
+    total_membres = Membre.objects.count()
+    membres_inactifs = total_membres - membres_actifs
+    pourcentage_actifs = (membres_actifs / total_membres) * 100 if total_membres > 0 else 0
+    pourcentage_inactifs = (membres_inactifs / total_membres) * 100 if total_membres > 0 else 0
+    livres_empruntes = Emprunt.objects.filter(date_retour__isnull=True).count()
+    aujourd_hui = timezone.now().date()
+    retours_en_attente = Emprunt.objects.filter(date_retour__lt=aujourd_hui).count()
+
+    # Dernières activités (10 derniers emprunts)
+    dernieres_activites = Emprunt.objects.select_related('membre', 'exemplaire').order_by('-date_emprunt')[:10]
+
+    # Données pour le graphique (emprunts du dernier mois)
+    un_mois_avant = aujourd_hui - timedelta(days=30)  # 1 mois en arrière
+    emprunts_par_jour = (
+        Emprunt.objects
+        .filter(date_emprunt__gte=un_mois_avant)  # Emprunts du dernier mois
+        .annotate(jour=TruncDay('date_emprunt'))  # Grouper par jour
+        .values('jour')
+        .annotate(total=Count('id'))  # Compter les emprunts par jour
+        .order_by('jour')
+    )
+
+    # Préparer les données pour Chart.js
+    labels = []
+    data = []
+    for emprunt in emprunts_par_jour:
+        labels.append(emprunt['jour'].strftime('%d %b'))  # Format : "01 Jan"
+        data.append(emprunt['total'])
+
+    # Passer les données au template
+    context = {
+        'total_livres': total_livres,
+        'membres_actifs': membres_actifs,
+        'total_membres': total_membres,
+        'membres_inactifs': membres_inactifs,
+        'pourcentage_actifs': pourcentage_actifs,
+        'pourcentage_inactifs': pourcentage_inactifs,
+        'livres_empruntes': livres_empruntes,
+        'retours_en_attente': retours_en_attente,
+        'dernieres_activites': dernieres_activites,
+        'labels': labels,
+        'data': data,
+    }
+    return render(request, 'gestion/dashboard.html', context)
+
+from django.shortcuts import render, get_object_or_404
+from .models import Emprunt
+from .forms import EmpruntForm
+
+def modifier_emprunt(request, emprunt_id):
+    emprunt = get_object_or_404(Emprunt, id=emprunt_id)
+    if request.method == 'POST':
+        form = EmpruntForm(request.POST, instance=emprunt)
+        if form.is_valid():
+            form.save()
+            return redirect('gestion_emprunts')  # Redirige vers la liste des emprunts
+    else:
+        form = EmpruntForm(instance=emprunt)
+    return render(request, 'gestion/modifier_emprunt.html', {'form': form})
+from django.shortcuts import get_object_or_404, redirect
+from .models import Emprunt
+
+def supprimer_emprunt(request, emprunt_id):
+    emprunt = get_object_or_404(Emprunt, id=emprunt_id)
+    if request.method == 'POST':
+        emprunt.delete()
+        return redirect('gestion_emprunts')  # Redirige vers la liste des emprunts
+    # Si la méthode n'est pas POST, tu peux gérer cela différemment (par exemple, afficher une erreur)

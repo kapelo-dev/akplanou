@@ -128,7 +128,7 @@ function filterTable() {
     table = document.getElementById("livresTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[1]; // Assuming the title is in the second column
+        td = tr[i].getElementsByTagName("td")[1]; // Recherche basée sur la colonne "Titre"
         if (td) {
             txtValue = td.textContent || td.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {

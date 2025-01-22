@@ -1,15 +1,145 @@
 {% extends "gestion/base.html" %}
-{% load static %}
 
-{% block title %}Tableau de Bord{% endblock %}
+{% block title %}Tableau de Bord - Bibliotech{% endblock %}
 
 {% block content %}
-
-    <section class="home-section">
-        <div class="home-content">
-            <i class="fas fa-bars"></i>
-            <span class="text">Tableau de Bord</span>
+<div class="container mt-5">
+    <!-- En-tête du tableau de bord -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-4 text-primary mb-3">
+                <i class="fas fa-chart-line me-3"></i>Tableau de Bord
+            </h1>
+            <hr class="mb-4">
         </div>
+    </div>
 
-       
+    <!-- Statistiques principales -->
+    <div class="row mb-4">
+        <!-- Total des Livres -->
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Total des Livres</h5>
+                    <h2 class="text-primary">{{ total_livres }}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Membres Actifs -->
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Membres Actifs</h5>
+                    <h2 class="text-success">{{ membres_actifs }}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Livres Empruntés -->
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Livres Empruntés</h5>
+                    <h2 class="text-info">{{ livres_empruntes }}</h2>
+                </div>
+            </div>
+        </div>
+        <!-- Retours en Attente -->
+        <div class="col-md-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-muted">Retours en Attente</h5>
+                    <h2 class="text-warning">{{ retours_en_attente }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graphique des emprunts -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>Activité des Emprunts (6 derniers mois)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <canvas id="empruntsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dernières activités -->
+    <!-- <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>Dernières Activités
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Membre</th>
+                                <th>Livre</th>
+                                <th>Date de Retour Prévue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for activite in dernieres_activites %}
+                            <tr>
+                                <td>{{ activite.date_emprunt }}</td>
+                                <td>{{ activite.membre.nom }} {{ activite.membre.prenom }}</td>
+                                <td>{{ activite.exemplaire.livre.titre }}</td>
+                                <td>{{ activite.date_retour_prevue }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Données pour le graphique
+    const labels = {{ labels|safe }};  // Mois
+    const data = {
+        labels: labels,
+        datasets: [{
+            label: 'Nombre d\'emprunts',
+            data: {{ data|safe }},  // Données dynamiques
+            backgroundColor: 'rgba(0, 123, 255, 0.2)',
+            borderColor: 'rgba(0, 123, 255, 1)',
+            borderWidth: 2,
+            tension: 0.4  // Courbe lisse
+        }]
+    };
+
+    // Configuration du graphique
+    const config = {
+        type: 'line',
+        data: data,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    };
+
+    // Initialisation du graphique
+    const empruntsChart = new Chart(
+        document.getElementById('empruntsChart'),
+        config
+    );
+</script>
 {% endblock %}

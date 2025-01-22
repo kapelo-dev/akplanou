@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestion de Bibliothèque{% endblock %}</title>
+    <!-- Ajoute ici tes liens CSS ou autres balises head -->
+</head>
+<body>
+    <header>
+        <h1>Gestion de Bibliothèque</h1>
+        <nav>
+            {% if user.is_authenticated %}
+                <p>Bienvenue, {{ user.username }} !</p>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Déconnexion</button>
+                </form>
+            {% else %}
+                <p><a href="{% url 'login' %}">Connexion</a> | <a href="{% url 'signup' %}">Inscription</a></p>
+            {% endif %}
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Le contenu spécifique à chaque page sera inséré ici -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Gestion de Bibliothèque</p>
+    </footer>
+</body>
+</html>

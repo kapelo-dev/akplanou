@@ -12,7 +12,7 @@
             </h1>
             <div class="search-bar">
                 <input type="text" id="search" name="search" placeholder="Rechercher un exemplaire..." onkeyup="filterList()">
-                <a href="{% url 'ajouter_exemplaire' %}" class="btn btn-success">
+                <a href="{% url 'ajouter_exemplaire' livre.id %}" class="btn btn-success">
                     <i class="fas fa-plus-circle me-2"></i>Ajouter un exemplaire
                 </a>
                 <a href="javascript:history.back()" class="btn btn-link">

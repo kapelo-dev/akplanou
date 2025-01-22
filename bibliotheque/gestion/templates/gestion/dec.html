@@ -1,0 +1,62 @@
+{% extends "base1.html" %}
+
+{% block content %}
+<div class="logout-container">
+    <div class="logout-card">
+        <h2 class="logout-title">Déconnexion réussie</h2>
+        <p class="logout-message">Vous avez été déconnecté avec succès.</p>
+        <a href="{% url 'login' %}" class="btn btn-primary logout-button">
+            <i class="fas fa-sign-in-alt me-2"></i>Se reconnecter
+        </a>
+    </div>
+</div>
+
+<!-- Styles CSS -->
+<style>
+    /* Conteneur principal */
+    .logout-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Prend toute la hauteur de l'écran */
+        background-color: #f8f9fa; /* Fond clair */
+    }
+
+    /* Carte de déconnexion */
+    .logout-card {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px;
+        width: 100%;
+    }
+
+    /* Titre */
+    .logout-title {
+        font-size: 2rem;
+        color: #007bff; /* Couleur bleue */
+        margin-bottom: 20px;
+    }
+
+    /* Message */
+    .logout-message {
+        font-size: 1.2rem;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    /* Bouton de reconnexion */
+    .logout-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover {
+        background-color: #0056b3; /* Bleu plus foncé au survol */
+    }
+</style>
+{% endblock %}

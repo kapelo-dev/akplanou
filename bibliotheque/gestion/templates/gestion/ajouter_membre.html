@@ -5,7 +5,18 @@
 {% block content %}
 <div class="container mt-4">
     <h1 class="mb-4">Ajouter un membre</h1>
-    <form method="post">
+
+    <!-- Messages de succès ou d'erreur -->
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post" id="membreForm">
         {% csrf_token %}
         <div class="form-group">
             <label for="nom">Nom:</label>
@@ -43,4 +54,23 @@
         <button type="button" class="btn btn-secondary" onclick="history.back();">Annuler</button>
     </form>
 </div>
+
+<!-- Script pour confirmer l'ajout et valider le téléphone -->
+<script>
+    document.getElementById('membreForm').onsubmit = function(event) {
+        const telephoneInput = document.getElementById('telephone');
+        const telephoneValue = telephoneInput.value.trim();
+
+        // Validation du numéro de téléphone (exemple : 10 chiffres)
+        if (!/^\d{10}$/.test(telephoneValue)) {
+            alert("Veuillez entrer un numéro de téléphone valide (10 chiffres).");
+            event.preventDefault();
+            return;
+        }
+
+        if (!confirm("Êtes-vous sûr de vouloir ajouter ce membre ?")) {
+            event.preventDefault(); // Annule la soumission du formulaire
+        }
+    };
+</script>
 {% endblock %}

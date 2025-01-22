@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import timedelta
 from django.utils import timezone
+from django.contrib.auth.models import AbstractUser
 
 class Abonnement(models.Model):
     libelle = models.CharField(max_length=100)
@@ -33,6 +34,7 @@ class Membre(models.Model):
 
     def __str__(self):
         return f"{self.nom} {self.prenom}"
+
 class Livre(models.Model):
     titre = models.CharField(max_length=200)
     auteur = models.CharField(max_length=100)
@@ -43,6 +45,7 @@ class Livre(models.Model):
 
     def __str__(self):
         return self.titre
+
     def exemplaires_disponibles(self):
         return self.exemplaire_set.filter(disponible=True).count()
 
@@ -65,3 +68,20 @@ class Emprunt(models.Model):
 
     def date_retour_prevue(self):
         return self.date_emprunt + timedelta(days=self.membre.abonnement.max_jours)
+
+class CustomUser(AbstractUser):
+    phone_number = models.CharField(max_length=15, blank=True)
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  # Unique related_name
+        blank=True,
+        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+        verbose_name='groups',
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',  # Unique related_name
+        blank=True,
+        help_text='Specific permissions for this user.',
+        verbose_name='user permissions',
+    )

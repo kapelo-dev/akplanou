@@ -7,6 +7,17 @@
     <i class="fas fa-arrow-left fa-2x border border-white p-2 rounded"></i>
 </a>
 <h1>Ajouter un emprunt</h1>
+
+<!-- Messages de succès ou d'erreur -->
+{% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    {% endfor %}
+{% endif %}
+
 <form method="post" id="empruntForm">
     {% csrf_token %}
     <div class="form-group">
@@ -40,7 +51,7 @@
 </form>
 
 <script>
-    let selectedExemplaires = [];
+    let selectedExemplaires = new Set(); // Utilisation d'un Set pour éviter les doublons
     let counter = 1;
 
     function loadExemplaires(selectElement, index) {
@@ -63,12 +74,15 @@
         const parentDiv = buttonElement.parentElement;
         const exemplaireSelect = parentDiv.querySelector('[id^="exemplaire-"]');
         const selectedOptions = Array.from(exemplaireSelect.selectedOptions);
+        if (selectedOptions.length === 0) {
+            alert("Veuillez sélectionner au moins un exemplaire.");
+            return;
+        }
         selectedOptions.forEach(option => {
-            if (!selectedExemplaires.includes(option.value)) {
-                selectedExemplaires.push(option.value);
-            }
+            selectedExemplaires.add(option.value); // Ajoute uniquement si non présent
         });
-        parentDiv.remove();
+        parentDiv.style.display = 'none'; // Masque la sélection au lieu de la supprimer
+        alert("Livre(s) ajouté(s) avec succès !");
     }
 
     function addLivreSelection() {
@@ -99,14 +113,31 @@
         if (selections.length > 0) {
             const lastSelection = selections[selections.length - 1];
             lastSelection.remove();
+            alert("Sélection de livre supprimée.");
+        } else {
+            alert("Aucune sélection à supprimer.");
         }
     }
 
-    document.getElementById('empruntForm').onsubmit = function() {
+    document.getElementById('empruntForm').onsubmit = function(event) {
+        if (selectedExemplaires.size === 0) {
+            alert("Veuillez sélectionner au moins un exemplaire.");
+            event.preventDefault();
+            return;
+        }
+        if (!document.getElementById('membre').value) {
+            alert("Veuillez sélectionner un membre.");
+            event.preventDefault();
+            return;
+        }
+        if (!confirm("Êtes-vous sûr de vouloir ajouter cet emprunt ?")) {
+            event.preventDefault();
+            return;
+        }
         const exemplairesInput = document.createElement('input');
         exemplairesInput.type = 'hidden';
         exemplairesInput.name = 'exemplaires';
-        exemplairesInput.value = selectedExemplaires.join(',');
+        exemplairesInput.value = Array.from(selectedExemplaires).join(',');
         this.appendChild(exemplairesInput);
     };
 </script>

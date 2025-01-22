@@ -46,7 +46,7 @@ ROOT_URLCONF = 'bibliotheque.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],  # Ajoute le chemin vers ton dossier templates
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -58,6 +58,10 @@ TEMPLATES = [
         },
     },
 ]
+
+
+LOGIN_REDIRECT_URL = 'accueil'  # Remplace 'dashboard' par le nom de l'URL de ton choix
+LOGOUT_REDIRECT_URL = 'login'  # Remplace 'accueil' par le nom de l'URL de ton choix
 
 WSGI_APPLICATION = 'bibliotheque.wsgi.application'
 
@@ -103,9 +107,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+# settings.py
+
+# Définir le dossier static global
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Dossiers supplémentaires pour les fichiers statiques
+STATICFILES_DIRS = [
+    BASE_DIR / "static",  # Si tu as un dossier static à la racine du projet
+]
+
+# Dossier où les fichiers statiques sont collectés pendant la production
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media files
 MEDIA_URL = '/media/'
@@ -116,3 +129,5 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
   
+
+

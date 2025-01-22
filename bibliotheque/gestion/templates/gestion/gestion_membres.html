@@ -45,7 +45,30 @@
                     <td>
                         <a class="btn btn-info btn-sm" href="{% url 'membre_detail' membre.id %}">Détails</a>
                         <a class="btn btn-warning btn-sm" href="{% url 'modifier_membre' membre.id %}">Modifier</a>
-                        <a class="btn btn-danger btn-sm" href="{% url 'supprimer_membre' membre.id %}" onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce membre ?');">Supprimer</a>
+                        <button class="btn btn-danger btn-sm" data-toggle="modal" data-target="#confirmDeleteModal{{ membre.id }}">Supprimer</button>
+                        <!-- Modal de confirmation de suppression -->
+                        <div class="modal fade" id="confirmDeleteModal{{ membre.id }}" tabindex="-1" role="dialog" aria-labelledby="confirmDeleteModalLabel{{ membre.id }}" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="confirmDeleteModalLabel{{ membre.id }}">Confirmer la suppression</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Êtes-vous sûr de vouloir supprimer ce membre ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                        <form method="post" action="{% url 'supprimer_membre' membre.id %}" style="display:inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                 {% endfor %}
@@ -96,7 +119,7 @@ function filterTable() {
     table = document.getElementById("membresTable");
     tr = table.getElementsByTagName("tr");
     for (i = 0; i < tr.length; i++) {
-        td = tr[i].getElementsByTagName("td")[0]; // Assuming the name is in the first column
+        td = tr[i].getElementsByTagName("td")[0]; // Recherche basée sur la colonne "Nom"
         if (td) {
             txtValue = td.textContent || td.innerText;
             if (txtValue.toUpperCase().indexOf(filter) > -1) {

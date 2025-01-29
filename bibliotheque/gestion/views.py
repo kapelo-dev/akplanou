@@ -4,6 +4,9 @@ from .forms import EmpruntForm, MembreForm, LivreForm, AbonnementForm, Exemplair
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.http import JsonResponse
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
+
 from django.contrib.auth.decorators import login_required
 @login_required
 def gestion_membres_view(request):
@@ -63,15 +66,25 @@ def gestion_emprunts_view(request):
     emprunts = Emprunt.objects.all().order_by('-date_emprunt')
     return render(request, 'gestion/gestion_emprunts.html', {'emprunts': emprunts})
 @login_required
+
+
 def ajouter_emprunt_view(request):
     if request.method == 'POST':
         membre_id = request.POST.get('membre')
         exemplaire_ids = request.POST.get('exemplaires').split(',')
         membre = get_object_or_404(Membre, id=membre_id)
 
-        if membre.emprunt_set.filter(date_retour__isnull=True).count() + len(exemplaire_ids) > membre.abonnement.max_livres:
-            return render(request, 'gestion/ajouter_emprunt.html', {'error': 'Le nombre maximum de livres empruntés a été atteint.'})
+        # Vérification de l'état de l'abonnement
+        if not membre.actif or membre.date_expiration < timezone.now().date():
+            messages.error(request, "L'abonnement du membre est inactif ou expiré. L'emprunt est interdit.")
+            return redirect('ajouter_emprunt')
 
+        # Vérification du nombre maximum de livres empruntés
+        if membre.emprunt_set.filter(date_retour__isnull=True).count() + len(exemplaire_ids) > membre.abonnement.max_livres:
+            messages.error(request, "Le nombre maximum de livres empruntés a été atteint.")
+            return redirect('ajouter_emprunt')
+
+        # Si l'abonnement est actif et le nombre de livres est dans la limite, continuez avec l'emprunt
         for exemplaire_id in exemplaire_ids:
             exemplaire = get_object_or_404(Exemplaire, id=exemplaire_id)
             emprunt = Emprunt(membre=membre, exemplaire=exemplaire, date_emprunt=timezone.now())
@@ -79,11 +92,13 @@ def ajouter_emprunt_view(request):
             exemplaire.save()
             emprunt.save()
 
+        messages.success(request, "Emprunt ajouté avec succès.")
         return redirect('gestion_emprunts')
     else:
         membres = Membre.objects.all()
         livres = Livre.objects.all()
         return render(request, 'gestion/ajouter_emprunt.html', {'membres': membres, 'livres': livres})
+
 
 def load_exemplaires(request, livre_id):
     livre = get_object_or_404(Livre, id=livre_id)
@@ -304,3 +319,40 @@ def supprimer_emprunt(request, emprunt_id):
         emprunt.delete()
         return redirect('gestion_emprunts')  # Redirige vers la liste des emprunts
     # Si la méthode n'est pas POST, tu peux gérer cela différemment (par exemple, afficher une erreur)
+
+    from django.shortcuts import render, get_object_or_404, redirect
+from .models import Livre, Exemplaire
+from .forms import ExemplaireForm
+
+def ajouter_exemplaire(request, livre_id):
+    livre = get_object_or_404(Livre, id=livre_id)
+    if request.method == 'POST':
+        form = ExemplaireForm(request.POST)
+        if form.is_valid():
+            exemplaire = form.save(commit=False)
+            exemplaire.livre = livre
+            exemplaire.save()
+            return redirect('livre_detail', livre_id=livre.id)
+    else:
+        form = ExemplaireForm()
+    return render(request, 'gestion/ajouter_exemplaire.html', {'form': form, 'livre': livre})
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Emprunt, Exemplaire
+
+def supprimer_emprunt(request, emprunt_id):
+    emprunt = get_object_or_404(Emprunt, id=emprunt_id)
+
+    if request.method == 'POST':
+        # Marquer l'exemplaire comme disponible
+        exemplaire = emprunt.exemplaire
+        exemplaire.disponible = True
+        exemplaire.save()
+
+        # Supprimer l'emprunt
+        emprunt.delete()
+
+        messages.success(request, "L'emprunt a été supprimé avec succès.")
+        return redirect('gestion_emprunts')
+
+    return render(request, 'gestion/supprimer_emprunt.html', {'emprunt': emprunt})

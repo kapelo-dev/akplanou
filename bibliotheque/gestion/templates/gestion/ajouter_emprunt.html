@@ -140,5 +140,17 @@
         exemplairesInput.value = Array.from(selectedExemplaires).join(',');
         this.appendChild(exemplairesInput);
     };
+
+    document.getElementById('membre').addEventListener('change', function() {
+        const membreId = this.value;
+        fetch(`/verifier_abonnement/${membreId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (!data.abonnement_actif) {
+                    alert("L'abonnement du membre est inactif ou expiré. L'emprunt est interdit.");
+                    document.getElementById('empruntForm').reset();
+                }
+            });
+    });
 </script>
 {% endblock %}

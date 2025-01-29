@@ -62,7 +62,7 @@
         const telephoneValue = telephoneInput.value.trim();
 
         // Validation du numéro de téléphone (exemple : 10 chiffres)
-        if (!/^\d{10}$/.test(telephoneValue)) {
+        if (!/^\d{8}$/.test(telephoneValue)) {
             alert("Veuillez entrer un numéro de téléphone valide (10 chiffres).");
             event.preventDefault();
             return;
